@@ -1,0 +1,29 @@
+#tb{
+	margin-top: 50px;}
+
+table{
+	margin: auto;}
+
+
+form{
+	text-align: center;
+	margin-bottom: 10px;}
+
+#orderByType{
+	font-size: 20px;}
+
+
+option{
+	color: red;
+	font-size: 20px;}
+
+th{
+	height: 25px;
+	background: #3578E5;
+	width:100px; }
+
+
+tr, td{
+	text-align: center;
+	background: white;
+	width:100px;}
