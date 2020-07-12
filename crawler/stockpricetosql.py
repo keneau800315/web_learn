@@ -68,29 +68,37 @@ stock_list = df['有價證券代號'].values.tolist()
 def crawl_price(stock_list):
     now = datetime.datetime.now()
     date = str(now.year) + '-' + str(now.month) + '-' + str(now.day)
+    date_no = str(now.year) + str(now.month).zfill(2) + str(now.day)
     column = ['Stock_no','Date', 'Volume', 'Value', 'Open', 'High', 'Low', 'Close', 'Transaction']
     df = pd.DataFrame(columns=column)
     for stock_no in stock_list:
-        print(date, stock_no)
-        url = 'http://www.twse.com.tw/exchangeReport/STOCK_DAY?date=%s&stockNo=%s' % ( date, stock_no)
-        r = requests.get(url)
-        stock_no = int(stock_no)
-        data = json.loads(r.text)['data']
-        index = len(data)-1
-        Volume = int(data[index][1].replace(',', ''))
-        Value = int(data[index][2].replace(',', ''))
-        Open = float(data[index][3].replace(',', ''))
-        High = float(data[index][4].replace(',', ''))
-        Low = float(data[index][5].replace(',', ''))
-        Close = float(data[index][6].replace(',', ''))
-        Transaction = int(data[index][8].replace(',', ''))
-        s = pd.Series([stock_no,date,Volume,Value,Open,High,Low,Close,Transaction] , index = column)
-        df = df.append(s, ignore_index = True)
-        secs = random.randint(10, 20) + 20
-        time.sleep(secs)
-        print('sleep')
+        try:
+            print(date, stock_no)
+            url = 'http://www.twse.com.tw/exchangeReport/STOCK_DAY?date=%s&stockNo=%s' % ( date_no, stock_no)
+            r = requests.get(url,verify=False)
+            stock_no = int(stock_no)
+            data = json.loads(r.text)['data']
+            index = len(data)-1
+            d_date = data[index][0].replace(',', '-')
+            Volume = int(data[index][1].replace(',', ''))
+            Value = int(data[index][2].replace(',', ''))
+            Open = float(data[index][3].replace(',', ''))
+            High = float(data[index][4].replace(',', ''))
+            Low = float(data[index][5].replace(',', ''))
+            Close = float(data[index][6].replace(',', ''))
+            Transaction = int(data[index][8].replace(',', ''))
+            s = pd.Series([stock_no,d_date,Volume,Value,Open,High,Low,Close,Transaction] , index = column)
+            df = df.append(s, ignore_index = True)
+            secs = random.randint(5, 10) + 8
+            print('sleep')
+            time.sleep(secs)
+        #當天無交易價格
+        except ValueError:
+            pass
+        #下市
+        except KeyError:
+            pass
     return df
-
 
 df = crawl_price(stock_list)
 print(df)
@@ -99,6 +107,7 @@ print(df)
 
 engine = create_engine("mysql+pymysql://{}:{}@{}/{}?charset={}".format('root', 'root', '127.0.0.1:3306', 'finance','utf8'))
 con = engine.connect()
+#if_exists='replace'
 df.to_sql(name='stockprice', con=con, if_exists='append', index=False)
 
 
