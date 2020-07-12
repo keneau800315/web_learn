@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<link rel="shortcut icon" href="img/dollar_icon.png"/ type="image/png">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="css/virtual.css">
 	<script src="js/jquery-3.5.1.min.js" async></script>	
 	<script src="js/listdown.js" async defer></script>
 	<script src="js/home.js" async defer></script>	
